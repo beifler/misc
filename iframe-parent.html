@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>Ben Alman &raquo; jQuery postMessage &raquo; Examples &raquo; Iframe resizing</title>
+  <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+  
+<script type="text/javascript" src="//rawgit.com/cowboy/jquery-postmessage/master/jquery.ba-postmessage.min.js"></script>
+<script type="text/javascript" language="javascript">
+
+$(function(){
+  
+  // Keep track of the iframe height.
+  var if_height,
+  
+    // Pass the parent page URL into the Iframe in a meaningful way (this URL could be
+    // passed via query string or hard coded into the child page, it depends on your needs).
+    src = 'http://src.morningstarministries.org/iframechild.html#' + encodeURIComponent( document.location.href ),
+    
+    // Append the Iframe into the DOM.
+    iframe = $( '<iframe " src="' + src + '" width="700" height="1000" scrolling="no" frameborder="0"><\/iframe>' )
+      .appendTo( '#iframe' );
+  
+  // Setup a callback to handle the dispatched MessageEvent event. In cases where
+  // window.postMessage is supported, the passed event will have .data, .origin and
+  // .source properties. Otherwise, this will only have the .data property.
+  $.receiveMessage(function(e){
+    
+    // Get the height from the passsed data.
+    var h = Number( e.data.replace( /.*if_height=(\d+)(?:&|$)/, '$1' ) );
+    
+    if ( !isNaN( h ) && h > 0 && h !== if_height ) {
+      // Height has changed, update the iframe.
+      iframe.height( if_height = h );
+    }
+    
+  // An optional origin URL (Ignored where window.postMessage is unsupported).
+  }, 'http://src.morningstarministries.org' );
+  
+  // And for good measure, let's send a toggle_content message to the child.
+  $( '<a href="#">Show / hide Iframe content<\/a>' )
+    .appendTo( '#nav' )
+    .click(function(){
+      $.postMessage( 'toggle_content', src, iframe.get(0).contentWindow );
+      return false;
+    });
+  
+});
+</script>
+<style type="text/css" title="text/css">
+
+/*
+bg: #FDEBDC
+bg1: #FFD6AF
+bg2: #FFAB59
+orange: #FF7F00
+brown: #913D00
+lt. brown: #C4884F
+*/
+
+iframe {
+  border: 1px solid #000;
+}
+
+</style>
+
+</head>
+<body>
+
+<div id="page">
+
+  <div id="content">
+
+
+<p>
+  Note that both parent and child need to include the <a href="http://benalman.com/projects/jquery-postmessage-plugin/">jQuery postMessage</a> javascript, and for communication to be enabled in browsers that don't support window.postMessage, the child page must know the exact parent URL (in this example, that is done by passing the parent location into the Iframe using a hash param in the Iframe src attribute).
+</p>
+
+<p id="nav"></p>
+
+<div id="iframe" class="clear"></div>
+
+<h3>The parent window code</h3>
+
+
+  </div>
+  <div id="footer">
+    <p>
+      If console output is mentioned, but your browser has no console, this example is using <a href="http://benalman.com/projects/javascript-debug-console-log/">JavaScript Debug</a>. Click this bookmarklet: <a href="javascript:if(!window.firebug){window.firebug=document.createElement(&quot;script&quot;);firebug.setAttribute(&quot;src&quot;,&quot;http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js&quot;);document.body.appendChild(firebug);(function(){if(window.firebug.version){firebug.init()}else{setTimeout(arguments.callee)}})();void (firebug);if(window.debug&&debug.setCallback){(function(){if(window.firebug&&window.firebug.version){debug.setCallback(function(b){var a=Array.prototype.slice.call(arguments,1);firebug.d.console.cmd[b].apply(window,a)},true)}else{setTimeout(arguments.callee,100)}})()}};">Debug + Firebug Lite</a> to add the Firebug lite console to the current page. Syntax highlighting is handled by <a href="http://alexgorbatchev.com/">SyntaxHighlighter</a>.
+    </p>
+    <p>
+      All original code is Copyright © 2009 "Cowboy" Ben Alman and dual licensed under the MIT and GPL licenses. View the <a href="http://benalman.com/about/license/">license page</a> for more details. 
+    </p>
+  </div>
+</div>
+
+</body>
+</html>
